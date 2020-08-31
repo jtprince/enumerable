@@ -1,6 +1,7 @@
 import unittest
 from builtins import super
 from expects import *
+from enumerable.iterators import Enumerable
 
 
 class TestEnumerableFilter(unittest.TestCase):
@@ -12,7 +13,6 @@ class TestEnumerableFilter(unittest.TestCase):
         """
         When called it should always return an enumerable object.
         """
-        from enumerable.iterators import Enumerable
 
         def even_numbers(x):
             return x % 2 == 0
@@ -24,8 +24,6 @@ class TestEnumerableFilter(unittest.TestCase):
         """
         When called it should filter out items based on the provided function.
         """
-        from enumerable.iterators import Enumerable
-
         def even_numbers(x):
             # Returns true if x is evenly divisible by two
             return x % 2 == 0
@@ -38,8 +36,6 @@ class TestEnumerableFilter(unittest.TestCase):
         When called with additional arguments, those arguments should
         be passed to the provided function.
         """
-        from enumerable.iterators import Enumerable
-
         def divisible_by(x, div):
             # Returns true if x is evenly divisible by div
             return x % div == 0
@@ -57,8 +53,6 @@ class TestEnumerableMap(unittest.TestCase):
         """
         When called it should return an Enumerable object.
         """
-        from enumerable.iterators import Enumerable
-
         def square_number(x):
             # Returns x^2
             return x * x
@@ -71,8 +65,6 @@ class TestEnumerableMap(unittest.TestCase):
         When called, it should return the results of each item in the iterable
         passed to the function.
         """
-        from enumerable.iterators import Enumerable
-
         def square_number(x):
             # Returns x^2
             return x*x
@@ -85,8 +77,6 @@ class TestEnumerableMap(unittest.TestCase):
         When called it should pass any additional paramaters to the provided
         function.
         """
-        from enumerable.iterators import Enumerable
-
         def multiply_by(x, mul):
             return x * mul
 
@@ -103,8 +93,6 @@ class TestEnumerableReduce(unittest.TestCase):
         """
         When called it should reduce the iterable down to a single value.
         """
-        from enumerable.iterators import Enumerable
-
         def sum(accumulator, value):
             return accumulator + value
 
@@ -116,8 +104,6 @@ class TestEnumerableReduce(unittest.TestCase):
         When provided an initializer value, the accumulator should start at
         this value.
         """
-        from enumerable.iterators import Enumerable
-
         def sum(accumulator, value):
             return accumulator + value
 
@@ -129,8 +115,6 @@ class TestEnumerableReduce(unittest.TestCase):
         When provided with additional paramaters it should pass them to the
         provided function.
         """
-        from enumerable.iterators import Enumerable
-
         def sum_plus(accumulator, value, padding):
             return accumulator + value + padding
 
@@ -138,13 +122,63 @@ class TestEnumerableReduce(unittest.TestCase):
         expect(result).to(equal(20))
 
 
+class TestCompact(unittest.TestCase):
+    def test_it_should_remove_nones_but_not_zero(self):
+        """
+        When the iterator has None in it, they should be removed, but not
+        zeros and empty strings.
+        """
+        test_data = [1, 0, '', None, 'dog', 'false', False, None]
+        expected = [1, 0, '', 'dog', 'false', False]
+        results = Enumerable(test_data).compact().to(list)
+        expect(results).to(equal(expected))
+
+
+class TestEachCons(unittest.TestCase):
+    def test_it_should_return_sliding_window_over_iterable(self):
+        """
+        When the iterator has None in it, they should be removed, but not
+        zeros and empty strings.
+        """
+        test_data = [1,2,3,4,5,6,7]
+        results = Enumerable(test_data).each_cons(2).to(list)
+        expected = [(1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7)]
+        expect(results).to(equal(expected))
+
+    def test_it_should_return_less_if_less(self):
+        """
+        When there are less than n available, returns an empty enumerable.
+        """
+        test_data = [1,2]
+        results = Enumerable(test_data).each_cons(3).to(list)
+        expect(results).to(equal([]))
+
+
+class TestEachSlice(unittest.TestCase):
+    def test_it_should_return_chunks_over_iterable(self):
+        """
+        When given a size, returns chunks of that size.
+        """
+        test_data = [1,2,3,4,5,6,7]
+        results = Enumerable(test_data).each_cons(2).to(list)
+        expected = [(1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7)]
+        expect(results).to(equal(expected))
+
+    def test_it_should_return_less_if_less(self):
+        """
+        When there are less than n available, returns an empty enumerable.
+        """
+        test_data = [1,2]
+        results = Enumerable(test_data).each_cons(3).to(list)
+        expect(results).to(equal([]))
+
+
+
 class TestEnumerableTo(unittest.TestCase):
     def test_it_should_cast_the_internal_iterator_to_the_provided_container_type(self):
         """
         When called it should return the internal iterator cast as the provided type.
         """
-        from enumerable.iterators import Enumerable
-
         test_data = [1, 2, 3, 4, 5]
         results = Enumerable(test_data).to(list)
         expect(results).to(equal(test_data))
